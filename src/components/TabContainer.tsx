@@ -8,25 +8,32 @@ const TabContainer: React.FC = () => {
   const { tabs, activeTabId, setActiveTab, removeTab } = useTabStore();
 
   const tabItems = tabs.map(tab => {
-    const config = TAB_CONFIG[tab.tabId];
+    const config = TAB_CONFIG[tab.tabType];
     
+    // Get the label based on tab type and data
+    let label = config.tabDisplayData.label;
+    if (tab.tabType === 'PROJECT_DETAILS' && tab.data?.projectId) {
+      const projectName = tab.data.projectId === 'project-onboarding' ? 'Onboarding' : 'Offboarding';
+      label = `Project ${projectName}`;
+    }
+
     return {
       id: tab.instanceId,
       content: (
         <InlineStack gap="200" align="center">
-          <Text as="span">{config.tabDisplayData.label}</Text>
+          <Text as="span">{label}</Text>
           <Button
             variant="plain"
             icon={CancelMajor}
             onClick={(e: React.MouseEvent) => {
-              e.stopPropagation();  // Prevent tab selection when clicking close
+              e.stopPropagation();
               removeTab(tab.instanceId);
             }}
             accessibilityLabel="Close tab"
           />
         </InlineStack>
       ),
-      accessibilityLabel: config.tabDisplayData.label
+      accessibilityLabel: label
     };
   });
 
@@ -42,7 +49,7 @@ const TabContainer: React.FC = () => {
       tabs={tabItems}
       selected={tabs.findIndex(tab => tab.instanceId === activeTabId)}
       onSelect={handleTabChange}
-      fitted
+      
     />
   );
 };

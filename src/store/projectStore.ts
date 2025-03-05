@@ -58,7 +58,7 @@ const projectConfig = {
   cache: {
     expiryTime: 60,
     strategy: 'memory' as CacheStrategy,
-    tabBehavior: 'persist' as TabBehavior,
+    tabBehavior: 'reset' as TabBehavior,
     clearOnRefresh: true
   }
 };
