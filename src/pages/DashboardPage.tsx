@@ -16,6 +16,7 @@ import {
 } from '../components/dashboard';
 import { useDashboardStore } from '../store/dashboardStore';
 import { shallow } from 'zustand/shallow';
+import { ProjectList } from '../components/dashboard/ProjectList';
 
 const DashboardPage: React.FC = () => {
   const { metrics, updateMetrics } = useDashboardStore(
@@ -45,6 +46,10 @@ const DashboardPage: React.FC = () => {
         </Layout.Section>
         <Layout.Section variant="oneHalf">
           <ProgressMetrics />
+        </Layout.Section>
+
+        <Layout.Section>
+          <ProjectList />
         </Layout.Section>
 
         <Layout.Section>
