@@ -8,6 +8,7 @@ interface ProjectDetailsState extends BaseState {
   editedProject: Partial<ProjectDetails> | null;
   isLoading: boolean;
   error: string | null;
+  currentProjectId: string | null;
   fetchProject: (projectId: string) => Promise<void>;
   updateField: (field: keyof ProjectDetails, value: any) => void;
   saveChanges: () => Promise<void>;
@@ -22,24 +23,37 @@ const projectDetailsConfig = {
     editedProject: null,
     isLoading: false,
     error: null,
-    hasUnsavedChanges: false
+    hasUnsavedChanges: false,
+    currentProjectId: null
   },
   methods: (
     set: (state: Partial<ProjectDetailsState>) => void,
     get: () => ProjectDetailsState
   ) => ({
     fetchProject: async (projectId: string) => {
+      const { currentProjectId, project } = get();
+      
+      if (projectId === currentProjectId && project) {
+        return;
+      }
+
       set({ isLoading: true, error: null });
       try {
         const project = await projectService.getProjectDetails(projectId);
         set({ 
           project, 
+          currentProjectId: projectId,
           editedProject: null,
           hasUnsavedChanges: false,
           isLoading: false 
         });
       } catch (error) {
-        set({ error: (error as Error).message, isLoading: false });
+        set({ 
+          error: (error as Error).message, 
+          isLoading: false,
+          project: null,
+          currentProjectId: null
+        });
       }
     },
 
@@ -91,7 +105,7 @@ const projectDetailsConfig = {
   cache: {
     expiryTime: 300,
     strategy: 'memory' as CacheStrategy,
-    tabBehavior: 'reset' as TabBehavior,
+    tabBehavior: 'persist' as TabBehavior,
     clearOnRefresh: true
   }
 };
