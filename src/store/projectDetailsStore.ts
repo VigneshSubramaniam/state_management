@@ -31,18 +31,11 @@ const projectDetailsConfig = {
     get: () => ProjectDetailsState
   ) => ({
     fetchProject: async (projectId: string) => {
-      const { currentProjectId, project } = get();
-      
-      if (projectId === currentProjectId && project) {
-        return;
-      }
-
       set({ isLoading: true, error: null });
       try {
         const project = await projectService.getProjectDetails(projectId);
         set({ 
-          project, 
-          currentProjectId: projectId,
+          project,
           editedProject: null,
           hasUnsavedChanges: false,
           isLoading: false 
@@ -51,8 +44,7 @@ const projectDetailsConfig = {
         set({ 
           error: (error as Error).message, 
           isLoading: false,
-          project: null,
-          currentProjectId: null
+          project: null
         });
       }
     },
