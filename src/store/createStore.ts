@@ -15,7 +15,7 @@ export function createStore<T extends BaseState>(config: StoreConfig<T>) {
           }
         }
       }
-      return get();
+      return { ...get(),...config.initialState } as T;
     };
 
     const wrappedSet = (updates: Partial<T>) => {
@@ -46,6 +46,8 @@ export function createStore<T extends BaseState>(config: StoreConfig<T>) {
       storeManager.clearTabState(config.id, tabId);
     }
   };
+
+  console.log(store)
 
   return store;
 } 

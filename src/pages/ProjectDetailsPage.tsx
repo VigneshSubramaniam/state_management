@@ -42,7 +42,6 @@ const ProjectDetailsPage: React.FC = () => {
     }),
     shallow
   );
-
   useEffect(() => {
     if (projectId) {
       fetchProject(projectId);

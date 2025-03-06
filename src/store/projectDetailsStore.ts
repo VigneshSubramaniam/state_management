@@ -31,6 +31,13 @@ const projectDetailsConfig = {
     get: () => ProjectDetailsState
   ) => ({
     fetchProject: async (projectId: string) => {
+      const projectData = get();
+      console.log({projectData});
+      const {project, editedProject} = projectData;
+      if (projectData && project) {
+        set({ project: project, editedProject: editedProject, isLoading: false, error: null });
+        return;
+      }
       set({ isLoading: true, error: null });
       try {
         const project = await projectService.getProjectDetails(projectId);
