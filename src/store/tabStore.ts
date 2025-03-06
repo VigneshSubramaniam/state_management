@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { TabState, TabInstance } from '../types/tab';
 import { TAB_CONFIG } from '../config/tabRegistry';
+import { storeManager } from './storeManager';
 
 export const useTabStore = create<TabState>((set, get) => ({
   tabs: [],
@@ -48,6 +49,9 @@ export const useTabStore = create<TabState>((set, get) => ({
   },
 
   removeTab: (tabId: string) => {
+    // First, clear all store data associated with this tab
+    storeManager.clearAllStoresForTab(tabId);
+    
     set(state => {
       const newTabs = state.tabs.filter(tab => tab.id !== tabId);
       return {

@@ -41,6 +41,28 @@ class StoreManager {
     this.tabStateCache.get(storeId)?.delete(tabId);
   }
 
+  // New method to clear all stores for a specific tab
+  clearAllStoresForTab(tabId: string): void {
+    // Iterate through all stores and clear this tab's state
+    this.tabStateCache.forEach((tabStates, storeId) => {
+      tabStates.delete(tabId);
+    });
+    
+    // Also reset any store that's currently using this tab's state
+    this.stores.forEach(({ store, config }) => {
+      const state = store.getState();
+      if (state._metadata?.tabId === tabId) {
+        store.setState({
+          ...config.initialState,
+          _metadata: {
+            ...state._metadata,
+            tabId: null
+          }
+        });
+      }
+    });
+  }
+
   registerStore<T extends BaseState>(
     id: string, 
     store: StoreApi<T>, 

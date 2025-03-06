@@ -15,7 +15,7 @@ export function createStore<T extends BaseState>(config: StoreConfig<T>) {
           }
         }
       }
-      return { ...get(),...config.initialState } as T;
+      return { ...get(), ...config.initialState } as T;
     };
 
     const wrappedSet = (updates: Partial<T>) => {
@@ -33,7 +33,13 @@ export function createStore<T extends BaseState>(config: StoreConfig<T>) {
 
     return {
       ...config.initialState,
-      ...config.methods(wrappedSet, wrappedGet)
+      ...config.methods(wrappedSet, wrappedGet),
+      _metadata: {
+        lastAccessed: Date.now(),
+        lastUpdated: Date.now(),
+        tabId: null,
+        lastResetTab: null
+      }
     } as T;
   });
 
