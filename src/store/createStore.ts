@@ -1,57 +1,51 @@
 import { create } from 'zustand';
 import { BaseState, StoreConfig } from '../types/store';
 import { storeManager } from './storeManager';
+import { useTabStore } from './tabStore';
 
 export function createStore<T extends BaseState>(config: StoreConfig<T>) {
   const store = create<T>((set, get) => {
-    // Initialize state with metadata
-    const initialState = {
-      ...config.initialState,
-      _metadata: {
-        lastAccessed: Date.now(),
-        lastUpdated: Date.now(),
-        tabId: null,
-        lastResetTab: null
-      }
-    };
-
-    // Create wrapped set and get functions to handle metadata
-    const wrappedSet = (state: Partial<T>) => {
-      const currentState = get();
-      set({
-        ...currentState,
-        ...state,
-        _metadata: {
-          ...currentState._metadata,
-          lastUpdated: Date.now()
-        }
-      });
-    };
-
     const wrappedGet = () => {
-      const state = get();
-      // Update lastAccessed in metadata
-      set({
-        ...state,
-        _metadata: {
-          ...state._metadata,
-          lastAccessed: Date.now()
+      if (config.cache?.tabBehavior === 'persist') {
+        const { activeTabId } = useTabStore.getState();
+        if (activeTabId) {
+          const cachedState = storeManager.getTabState<T>(config.id, activeTabId);
+          if (cachedState) {
+            return cachedState;
+          }
         }
-      });
-      return state;
+      }
+      return get();
     };
 
-    // Initialize methods with wrapped set and get
-    const methods = config.methods?.(wrappedSet, wrappedGet) || {};
+    const wrappedSet = (updates: Partial<T>) => {
+      const newState = { ...get(), ...updates };
+      
+      if (config.cache?.tabBehavior === 'persist') {
+        const { activeTabId } = useTabStore.getState();
+        if (activeTabId) {
+          storeManager.setTabState(config.id, activeTabId, newState);
+        }
+      }
+      
+      set(newState);
+    };
 
     return {
-      ...initialState,
-      ...methods
+      ...config.initialState,
+      ...config.methods(wrappedSet, wrappedGet)
     } as T;
   });
 
-  // Register the store with the manager
+  // Register store with manager
   storeManager.registerStore(config.id, store, config);
+
+  // Add method to clear tab state
+  store.clearTabState = (tabId: string) => {
+    if (config.cache?.tabBehavior === 'persist') {
+      storeManager.clearTabState(config.id, tabId);
+    }
+  };
 
   return store;
 } 

@@ -57,5 +57,14 @@ export const useTabStore = create<TabState>((set, get) => ({
 
   setActiveTab: (instanceId: string) => {
     set({ activeTabId: instanceId });
+  },
+
+  // Add this method to generate unique tab instance IDs
+  getTabInstanceId: (tabId: string, dataId?: string) => {
+    const tab = get().tabs.find(t => t.instanceId === tabId);
+    if (!tab) return tabId;
+    
+    // For tabs with data (like project details), combine tab ID with data ID
+    return dataId ? `${tab.tabType}:${dataId}` : tab.instanceId;
   }
 })); 
