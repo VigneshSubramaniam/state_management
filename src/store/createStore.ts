@@ -13,9 +13,14 @@ export function createStore<T extends BaseState>(config: StoreConfig<T>) {
           if (cachedState) {
             return cachedState;
           }
+          else {
+            return { ...get(), ...config.initialState } as T;
+          }
         }
+        
       }
-      return { ...get(), ...config.initialState } as T;
+      return get();
+     
     };
 
     const wrappedSet = (updates: Partial<T>) => {

@@ -35,7 +35,7 @@ const TabManager: React.FC = () => {
                 key={config.id}
                 path={config.url.path}
                 element={
-                  <TabStateWrapper>
+                  <TabStateWrapper key={activeTab?.url}>
                     <config.component />
                   </TabStateWrapper>
                 }
