@@ -17,7 +17,8 @@ export interface TabContentData {
 }
 
 export interface TabConfig {
-  tabId: string;  // This is now the tab type identifier
+  id: string;  // Base tab ID
+  dynamicId?: string; // Field in data to use for dynamic IDs
   tabIcon: Icon;
   url: {
     url: string;
@@ -35,16 +36,16 @@ export interface TabConfig {
 }
 
 export interface TabInstance {
-  instanceId: string;     // Unique identifier for this specific tab instance
-  tabType: string;       // References the tab type from TAB_CONFIG
-  url: string;           // Actual URL with params replaced
+  id: string;           // Unique tab ID (base ID + dynamic part if applicable)
+  tabType: string;      // References the tab type from TAB_CONFIG
+  url: string;          // Actual URL with params replaced
   data?: Record<string, any>; // Any data needed for this tab instance
 }
 
 export interface TabState {
   tabs: TabInstance[];
   activeTabId: string | null;
-  addTab: (tabType: string, data?: Record<string, any>) => void;
-  removeTab: (instanceId: string) => void;
-  setActiveTab: (instanceId: string) => void;
+  addTab: (tabType: string, data?: Record<string, any>) => TabInstance | null;
+  removeTab: (tabId: string) => void;
+  setActiveTab: (tabId: string) => void;
 } 

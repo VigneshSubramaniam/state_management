@@ -3,9 +3,11 @@ import { Tabs, Button, InlineStack, Text } from '@shopify/polaris';
 import { CancelMajor } from '@shopify/polaris-icons';
 import { useTabStore } from '../store/tabStore';
 import { TAB_CONFIG } from '../config/tabRegistry';
+import { useNavigate } from 'react-router-dom';
 
 const TabContainer: React.FC = () => {
   const { tabs, activeTabId, setActiveTab, removeTab } = useTabStore();
+  const navigate = useNavigate();
 
   const tabItems = tabs.map(tab => {
     const config = TAB_CONFIG[tab.tabType];
@@ -18,7 +20,7 @@ const TabContainer: React.FC = () => {
     }
 
     return {
-      id: tab.instanceId,
+      id: tab.id,
       content: (
         <InlineStack gap="200" align="center">
           <Text as="span">{label}</Text>
@@ -27,7 +29,7 @@ const TabContainer: React.FC = () => {
             icon={CancelMajor}
             onClick={(e: React.MouseEvent) => {
               e.stopPropagation();
-              removeTab(tab.instanceId);
+              removeTab(tab.id);
             }}
             accessibilityLabel="Close tab"
           />
@@ -40,16 +42,16 @@ const TabContainer: React.FC = () => {
   const handleTabChange = (selectedTabIndex: number) => {
     const tab = tabs[selectedTabIndex];
     if (tab) {
-      setActiveTab(tab.instanceId);
+      setActiveTab(tab.id);
+      navigate(tab.url);
     }
   };
 
   return (
     <Tabs
       tabs={tabItems}
-      selected={tabs.findIndex(tab => tab.instanceId === activeTabId)}
+      selected={tabs.findIndex(tab => tab.id === activeTabId)}
       onSelect={handleTabChange}
-      
     />
   );
 };

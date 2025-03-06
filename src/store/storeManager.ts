@@ -1,6 +1,5 @@
 import { StoreApi } from 'zustand';
 import { BaseState, StoreConfig } from '../types/store';
-import { useTabStore } from './tabStore';
 
 class StoreManager {
   private static instance: StoreManager;
@@ -9,7 +8,7 @@ class StoreManager {
     config: StoreConfig<any>
   }>();
 
-  // Map<storeId, Map<tabInstanceId, state>>
+  // Map<storeId, Map<tabId, state>>
   private tabStateCache = new Map<string, Map<string, any>>();
 
   private constructor() {
@@ -25,24 +24,21 @@ class StoreManager {
     return StoreManager.instance;
   }
 
-  getTabState<T>(storeId: string, tabId: string, dataId?: string): T | null {
-    const tabInstanceId = useTabStore.getState().getTabInstanceId(tabId, dataId);
-    return this.tabStateCache.get(storeId)?.get(tabInstanceId) || null;
+  getTabState<T>(storeId: string, tabId: string): T | null {
+    return this.tabStateCache.get(storeId)?.get(tabId) || null;
   }
 
-  setTabState<T>(storeId: string, tabId: string, state: T, dataId?: string): void {
-    const tabInstanceId = useTabStore.getState().getTabInstanceId(tabId, dataId);
+  setTabState<T>(storeId: string, tabId: string, state: T): void {
     let storeCache = this.tabStateCache.get(storeId);
     if (!storeCache) {
       storeCache = new Map();
       this.tabStateCache.set(storeId, storeCache);
     }
-    storeCache.set(tabInstanceId, state);
+    storeCache.set(tabId, state);
   }
 
-  clearTabState(storeId: string, tabId: string, dataId?: string): void {
-    const tabInstanceId = useTabStore.getState().getTabInstanceId(tabId, dataId);
-    this.tabStateCache.get(storeId)?.delete(tabInstanceId);
+  clearTabState(storeId: string, tabId: string): void {
+    this.tabStateCache.get(storeId)?.delete(tabId);
   }
 
   registerStore<T extends BaseState>(

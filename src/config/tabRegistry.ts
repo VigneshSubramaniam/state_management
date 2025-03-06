@@ -15,7 +15,7 @@ const ProjectDetailsPage = lazy(() => import('../pages/ProjectDetailsPage'));
 
 export const TAB_CONFIG: Record<string, TabConfig> = {
   TIMESHEET: {
-    tabId: 'timesheet',
+    id: 'timesheet',
     tabIcon: TimelineAttachmentMajor,
     url: {
       url: '/timesheet',
@@ -29,11 +29,10 @@ export const TAB_CONFIG: Record<string, TabConfig> = {
       title: 'Timesheet',
       module: 'timesheet'
     },
-    component: TimeSheetPage,
-    serviceName: 'AccountService'
+    component: TimeSheetPage
   },
   PROJECTS: {
-    tabId: 'projects',
+    id: 'projects',
     tabIcon: CollectionsMajor,
     url: {
       url: '/projects',
@@ -47,11 +46,10 @@ export const TAB_CONFIG: Record<string, TabConfig> = {
       title: 'Projects',
       module: 'projects'
     },
-    component: ProjectsPage,
-    serviceName: 'ProjectService'
+    component: ProjectsPage
   },
   DASHBOARD: {
-    tabId: 'dashboard',
+    id: 'dashboard',
     tabIcon: HomeMajor,
     url: {
       url: '/',
@@ -65,14 +63,11 @@ export const TAB_CONFIG: Record<string, TabConfig> = {
       title: 'Dashboard',
       module: 'dashboard'
     },
-    component: DashboardPage,
-    // clearStores: [{
-    //   store: 'dashboardStore',
-    //   resetFunction: 'resetMetrics'
-    // }]
+    component: DashboardPage
   },
   PROJECT_DETAILS: {
-    tabId: 'project-details',
+    id: 'project-details',
+    dynamicId: 'projectId',
     tabIcon: ViewMajor,
     url: {
       url: '/project/:projectId',

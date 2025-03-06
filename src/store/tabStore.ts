@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { TabState, TabInstance } from '../types/tab';
 import { TAB_CONFIG } from '../config/tabRegistry';
-import { v4 as uuidv4 } from 'uuid';
 
 export const useTabStore = create<TabState>((set, get) => ({
   tabs: [],
@@ -9,18 +8,21 @@ export const useTabStore = create<TabState>((set, get) => ({
 
   addTab: (tabType: string, data?: Record<string, any>) => {
     const config = TAB_CONFIG[tabType];
-    if (!config) return;
+    if (!config) return null;
 
     let url = config.url.url;
     
-    // For tabs that should be unique (like Dashboard), check if already open
-    const isUnique = ['DASHBOARD', 'TIMESHEET', 'PROJECTS'].includes(tabType);
-    if (isUnique) {
-      const existingTab = get().tabs.find(tab => tab.tabType === tabType);
-      if (existingTab) {
-        get().setActiveTab(existingTab.instanceId);
-        return;
-      }
+    // Generate tab ID based on config and data
+    let tabId = config.id;
+    if (config.dynamicId && data && data[config.dynamicId]) {
+      tabId = `${config.id}:${data[config.dynamicId]}`;
+    }
+
+    // Check if tab already exists
+    const existingTab = get().tabs.find(tab => tab.id === tabId);
+    if (existingTab) {
+      get().setActiveTab(existingTab.id);
+      return existingTab;
     }
 
     // Handle dynamic URLs with parameters
@@ -31,7 +33,7 @@ export const useTabStore = create<TabState>((set, get) => ({
     }
 
     const newTab: TabInstance = {
-      instanceId: uuidv4(),
+      id: tabId,
       tabType,
       url,
       data
@@ -39,32 +41,34 @@ export const useTabStore = create<TabState>((set, get) => ({
 
     set(state => ({
       tabs: [...state.tabs, newTab],
-      activeTabId: newTab.instanceId
+      activeTabId: tabId
     }));
+
+    return newTab;
   },
 
-  removeTab: (instanceId: string) => {
+  removeTab: (tabId: string) => {
     set(state => {
-      const newTabs = state.tabs.filter(tab => tab.instanceId !== instanceId);
+      const newTabs = state.tabs.filter(tab => tab.id !== tabId);
       return {
         tabs: newTabs,
-        activeTabId: state.activeTabId === instanceId
-          ? newTabs[newTabs.length - 1]?.instanceId || null
+        activeTabId: state.activeTabId === tabId
+          ? newTabs[newTabs.length - 1]?.id || null
           : state.activeTabId
       };
     });
   },
 
-  setActiveTab: (instanceId: string) => {
-    set({ activeTabId: instanceId });
+  setActiveTab: (tabId: string) => {
+    set({ activeTabId: tabId });
   },
 
   // Add this method to generate unique tab instance IDs
   getTabInstanceId: (tabId: string, dataId?: string) => {
-    const tab = get().tabs.find(t => t.instanceId === tabId);
+    const tab = get().tabs.find(t => t.id === tabId);
     if (!tab) return tabId;
     
     // For tabs with data (like project details), combine tab ID with data ID
-    return dataId ? `${tab.tabType}:${dataId}` : tab.instanceId;
+    return dataId ? `${tab.tabType}:${dataId}` : tab.id;
   }
 })); 
