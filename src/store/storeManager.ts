@@ -8,6 +8,9 @@ class StoreManager {
     config: StoreConfig<any>
   }>();
 
+  // Map<storeId, Map<tabId, state>>
+  private tabStateCache = new Map<string, Map<string, any>>();
+
   private constructor() {
     this.loadPersistedStores();
     setInterval(() => this.cleanupExpiredStores(), 60000);
@@ -21,11 +24,50 @@ class StoreManager {
     return StoreManager.instance;
   }
 
+  getTabState<T>(storeId: string, tabId: string): T | null {
+    return this.tabStateCache.get(storeId)?.get(tabId) || null;
+  }
+
+  setTabState<T>(storeId: string, tabId: string, state: T): void {
+    let storeCache = this.tabStateCache.get(storeId);
+    if (!storeCache) {
+      storeCache = new Map();
+      this.tabStateCache.set(storeId, storeCache);
+    }
+    storeCache.set(tabId, state);
+  }
+
+  clearTabState(storeId: string, tabId: string): void {
+    this.tabStateCache.get(storeId)?.delete(tabId);
+  }
+
+  // New method to clear all stores for a specific tab
+  clearAllStoresForTab(tabId: string): void {
+    // Iterate through all stores and clear this tab's state
+    this.tabStateCache.forEach((tabStates, storeId) => {
+      tabStates.delete(tabId);
+    });
+    
+    // Also reset any store that's currently using this tab's state
+    this.stores.forEach(({ store, config }) => {
+      const state = store.getState();
+      if (state._metadata?.tabId === tabId) {
+        store.setState({
+          ...config.initialState,
+          _metadata: {
+            ...state._metadata,
+            tabId: null
+          }
+        });
+      }
+    });
+  }
+
   registerStore<T extends BaseState>(
     id: string, 
     store: StoreApi<T>, 
     config: StoreConfig<T>
-  ) {
+  ): void {
     this.stores.set(id, { store, config });
     this.loadPersistedState(id);
   }

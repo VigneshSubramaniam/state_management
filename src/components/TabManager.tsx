@@ -1,36 +1,41 @@
-import React, { Suspense } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import React, { Suspense, useEffect } from 'react';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { useTabStore } from '../store/tabStore';
 import { TAB_CONFIG } from '../config/tabRegistry';
 import TabContainer from './TabContainer';
 import TabStateWrapper from './TabStateWrapper';
+import { Spinner } from '@shopify/polaris';
 
 const TabManager: React.FC = () => {
-  const { tabs, activeTabId } = useTabStore();
+  const { tabs, activeTabId, setActiveTab } = useTabStore();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Only render the active tab's component
-  const activeTab = tabs.find(tab => tab.instanceId === activeTabId);
-  const activeConfig = activeTab ? TAB_CONFIG[activeTab.tabId] : null;
+  const activeTab = tabs.find(tab => tab.id === activeTabId);
 
-  React.useEffect(() => {
-    if (activeTab) {
+  // Sync URL with active tab (only when active tab changes)
+  useEffect(() => {
+    if (activeTab && activeTab.url !== location.pathname) {
       navigate(activeTab.url);
     }
-  }, [activeTabId]);
+  }, [activeTabId, navigate, activeTab]);
+
+  // We're removing the URL-to-tab sync to prevent flickering with dynamic URLs
+  // This means tabs will only be activated by explicit user actions (clicking tab or sidebar)
 
   return (
     <div className="tab-manager">
       <TabContainer />
       <div className="tab-content">
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<Spinner />}>
           <Routes>
             {Object.entries(TAB_CONFIG).map(([key, config]) => (
               <Route
-                key={config.tabId}
+                key={config.id}
                 path={config.url.path}
                 element={
-                  <TabStateWrapper>
+                  <TabStateWrapper key={activeTab?.url}>
                     <config.component />
                   </TabStateWrapper>
                 }

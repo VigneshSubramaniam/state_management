@@ -30,4 +30,35 @@ export interface ProjectStore {
   updateProject: (project: Project) => void;
   updateFormState: (state: Partial<ProjectFormState>) => void;
   resetFormState: () => void;
-} 
+}
+
+export interface ProjectDetails {
+  id: string;
+  name: string;
+  status: 'active' | 'completed' | 'on-hold';
+  totalTasks: number;
+  completedTasks: number;
+  pendingTasks: number;
+  type: 'onboarding' | 'offboarding';
+}
+
+export const INITIAL_PROJECTS: ProjectDetails[] = [
+  {
+    id: 'project-onboarding',
+    name: 'Project Onboarding',
+    status: 'active',
+    totalTasks: 10,
+    completedTasks: 4,
+    pendingTasks: 6,
+    type: 'onboarding'
+  },
+  {
+    id: 'project-offboarding',
+    name: 'Project Offboarding',
+    status: 'active',
+    totalTasks: 8,
+    completedTasks: 2,
+    pendingTasks: 6,
+    type: 'offboarding'
+  }
+]; 

@@ -6,28 +6,34 @@ import {
   CollectionsMajor 
 } from '@shopify/polaris-icons';
 import { useTabStore } from '../store/tabStore';
+import { useNavigate } from 'react-router-dom';
 
 const Sidebar: React.FC = () => {
   const { addTab } = useTabStore();
+  const navigate = useNavigate();
+
+  const handleNavClick = (tabType: string) => {
+    const tab = addTab(tabType);
+    if (tab) {
+      navigate(tab.url);
+    }
+  };
 
   const navigationItems = [
     {
       label: 'Dashboard',
       icon: HomeMajor,
-      onClick: () => addTab('DASHBOARD'),
-      selected: false
+      onClick: () => handleNavClick('DASHBOARD')
     },
     {
       label: 'Projects',
       icon: CollectionsMajor,
-      onClick: () => addTab('PROJECTS'),
-      selected: false
+      onClick: () => handleNavClick('PROJECTS')
     },
     {
       label: 'Timesheet',
       icon: TimelineAttachmentMajor,
-      onClick: () => addTab('TIMESHEET'),
-      selected: false
+      onClick: () => handleNavClick('TIMESHEET')
     }
   ];
 

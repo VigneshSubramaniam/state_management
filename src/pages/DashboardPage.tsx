@@ -1,143 +1,63 @@
-import React from 'react';
-import { 
-  Page, 
-  Layout, 
-  Card, 
-  FormLayout, 
-  TextField, 
-  Box,
-  Text
-} from '@shopify/polaris';
-import { 
-  ProjectMetrics, 
-  TaskMetrics, 
-  TeamMetrics, 
-  ProgressMetrics 
-} from '../components/dashboard';
+import React, { useEffect } from 'react';
+import { Page, Layout, Grid, Spinner } from '@shopify/polaris';
+import ProjectMetrics from '../components/dashboard/ProjectMetrics';
+import TaskMetrics from '../components/dashboard/TaskMetrics';
+import TeamMetrics from '../components/dashboard/TeamMetrics';
+import ProgressMetrics from '../components/dashboard/ProgressMetrics';
+import DashboardForm from '../components/dashboard/DashboardForm';
 import { useDashboardStore } from '../store/dashboardStore';
-import { shallow } from 'zustand/shallow';
+import { ProjectList } from '@/components/dashboard/ProjectList';
+
+// Separate component for the page title to prevent unnecessary re-renders
+const DashboardTitle = () => {
+  // Only subscribe to the title
+ 
+  return <>Dashboard</>;
+};
+
+// Separate component for the metrics section
+const MetricsSection = () => {
+  return (
+    <>
+    <Layout.Section>
+      <Grid>
+        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+          <ProjectMetrics />
+        </Grid.Cell>
+        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+          <TaskMetrics />
+        </Grid.Cell>
+        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+          <TeamMetrics />
+        </Grid.Cell>
+        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+          <ProgressMetrics />
+        </Grid.Cell>
+      </Grid>
+    </Layout.Section>
+     <Layout.Section>
+     <ProjectList />
+   </Layout.Section>
+   </>
+  );
+};
+
+// Separate component for the form section
+const FormSection = () => {
+  return (
+    <Layout.Section>
+      <DashboardForm />
+    </Layout.Section>
+  );
+};
 
 const DashboardPage: React.FC = () => {
-  const { metrics, updateMetrics } = useDashboardStore(
-    (state) => ({
-      metrics: state.metrics,
-      updateMetrics: state.updateMetrics
-    }),
-    shallow
-  );
-
-  const handleMetricChange = (field: string) => (value: string) => {
-    const numValue = parseInt(value) || 0;
-    updateMetrics({ [field]: numValue });
-  };
 
   return (
-    <Page title="Dashboard Overview">
+    <Page title={<DashboardTitle />}>
       <Layout>
-        <Layout.Section variant="oneHalf">
-          <ProjectMetrics />
-        </Layout.Section>
-        <Layout.Section variant="oneHalf">
-          <TaskMetrics />
-        </Layout.Section>
-        <Layout.Section variant="oneHalf">
-          <TeamMetrics />
-        </Layout.Section>
-        <Layout.Section variant="oneHalf">
-          <ProgressMetrics />
-        </Layout.Section>
-
-        <Layout.Section>
-          <Card>
-            <Box padding="400">
-              <Box paddingBlockEnd="400">
-                <Text variant="headingMd">Update Metrics</Text>
-              </Box>
-              <FormLayout>
-                <FormLayout.Group>
-                  <TextField
-                    label="Total Projects"
-                    type="number"
-                    value={metrics.totalProjects.toString()}
-                    onChange={handleMetricChange('totalProjects')}
-                    autoComplete="off"
-                  />
-                  <TextField
-                    label="Active Projects"
-                    type="number"
-                    value={metrics.activeProjects.toString()}
-                    onChange={handleMetricChange('activeProjects')}
-                    autoComplete="off"
-                  />
-                </FormLayout.Group>
-
-                <FormLayout.Group>
-                  <TextField
-                    label="Completed Tasks"
-                    type="number"
-                    value={metrics.completedTasks.toString()}
-                    onChange={handleMetricChange('completedTasks')}
-                    autoComplete="off"
-                  />
-                  <TextField
-                    label="Pending Tasks"
-                    type="number"
-                    value={metrics.pendingTasks.toString()}
-                    onChange={handleMetricChange('pendingTasks')}
-                    autoComplete="off"
-                  />
-                </FormLayout.Group>
-
-                <FormLayout.Group>
-                  <TextField
-                    label="Team Utilization (%)"
-                    type="number"
-                    value={metrics.teamUtilization.toString()}
-                    onChange={handleMetricChange('teamUtilization')}
-                    autoComplete="off"
-                    min="0"
-                    max="100"
-                  />
-                  <TextField
-                    label="Total Hours"
-                    type="number"
-                    value={metrics.totalHours.toString()}
-                    onChange={handleMetricChange('totalHours')}
-                    autoComplete="off"
-                  />
-                </FormLayout.Group>
-
-                <FormLayout.Group>
-                  <TextField
-                    label="Project Progress (%)"
-                    type="number"
-                    value={metrics.projectProgress.toString()}
-                    onChange={handleMetricChange('projectProgress')}
-                    autoComplete="off"
-                    min="0"
-                    max="100"
-                  />
-                  <TextField
-                    label="Budget Utilization (%)"
-                    type="number"
-                    value={metrics.budgetUtilization.toString()}
-                    onChange={handleMetricChange('budgetUtilization')}
-                    autoComplete="off"
-                    min="0"
-                    max="100"
-                  />
-                  <TextField
-                    label="Team count"
-                    type="number"
-                    value={metrics.teamCount.toString()}
-                    onChange={(value) => updateMetrics({ teamCount: parseInt(value) || 0 })}
-                    autoComplete="off"
-                  />
-                </FormLayout.Group>
-              </FormLayout>
-            </Box>
-          </Card>
-        </Layout.Section>
+        <MetricsSection />
+        <FormSection />
       </Layout>
     </Page>
   );

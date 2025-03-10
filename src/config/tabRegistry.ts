@@ -2,7 +2,8 @@ import { lazy } from 'react';
 import {
   HomeMajor,
   TimelineAttachmentMajor,
-  CollectionsMajor
+  CollectionsMajor,
+  ViewMajor
 } from '@shopify/polaris-icons';
 import { TabConfig } from '../types/tab';
 
@@ -10,10 +11,11 @@ import { TabConfig } from '../types/tab';
 const TimeSheetPage = lazy(() => import('../pages/TimeSheetPage'));
 const ProjectsPage = lazy(() => import('../pages/ProjectsPage'));
 const DashboardPage = lazy(() => import('../pages/DashboardPage'));
+const ProjectDetailsPage = lazy(() => import('../pages/ProjectDetailsPage'));
 
 export const TAB_CONFIG: Record<string, TabConfig> = {
   TIMESHEET: {
-    tabId: 'timesheet',
+    id: 'timesheet',
     tabIcon: TimelineAttachmentMajor,
     url: {
       url: '/timesheet',
@@ -27,11 +29,10 @@ export const TAB_CONFIG: Record<string, TabConfig> = {
       title: 'Timesheet',
       module: 'timesheet'
     },
-    component: TimeSheetPage,
-    serviceName: 'AccountService'
+    component: TimeSheetPage
   },
   PROJECTS: {
-    tabId: 'projects',
+    id: 'projects',
     tabIcon: CollectionsMajor,
     url: {
       url: '/projects',
@@ -45,11 +46,10 @@ export const TAB_CONFIG: Record<string, TabConfig> = {
       title: 'Projects',
       module: 'projects'
     },
-    component: ProjectsPage,
-    serviceName: 'ProjectService'
+    component: ProjectsPage
   },
   DASHBOARD: {
-    tabId: 'dashboard',
+    id: 'dashboard',
     tabIcon: HomeMajor,
     url: {
       url: '/',
@@ -63,10 +63,24 @@ export const TAB_CONFIG: Record<string, TabConfig> = {
       title: 'Dashboard',
       module: 'dashboard'
     },
-    component: DashboardPage,
-    // clearStores: [{
-    //   store: 'dashboardStore',
-    //   resetFunction: 'resetMetrics'
-    // }]
+    component: DashboardPage
+  },
+  PROJECT_DETAILS: {
+    id: 'project-details',
+    dynamicId: 'projectId',
+    tabIcon: ViewMajor,
+    url: {
+      url: '/project/:projectId',
+      path: '/project/:projectId'
+    },
+    tabDisplayData: {
+      name: 'PROJECT_DETAILS',
+      label: 'Project Details'
+    },
+    tabContentData: {
+      title: 'Project Details',
+      module: 'project-details'
+    },
+    component: ProjectDetailsPage
   }
 }; 
